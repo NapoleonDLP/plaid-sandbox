@@ -12,7 +12,7 @@
         };
 
         const handler = Plaid.create({
-            token: { await fetchLinkToken() },
+            token: await fetchLinkToken(),
             onSuccess: async (public_token, metadata) => {
                 console.log("*", publicToken)
                 console.log("*", metadata)
