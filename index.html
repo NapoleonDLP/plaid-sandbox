@@ -8,18 +8,22 @@
             const { linkToken } = await response.json();
             
             console.log("LINY TOKY: ", linkToken)
+
             return linkToken;
         };
 
         const handler = Plaid.create({
             token: await fetchLinkToken(),
-            onSuccess: async (public_token, metadata) => {
+            onload: () => {
+                console.log("0o0o0o00o0ooo0ooo0000", this.token)
+            },
+            onSuccess: async (publicToken, metadata) => {
                 console.log("*", publicToken)
                 console.log("*", metadata)
 
                 await fetch('/token-exchange', {
                     method: 'POST',
-                    body: JSON.stringify( publicToken ),
+                    body: JSON.stringify( {public_token: publicToken} ),
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -27,11 +31,11 @@
 
             },
             onExit: async (error, metadata) => {
-                console.log(error);
-                console.log(metadata);
+                console.log("onExit err:", error);
+                console.log("onExit meta:",metadata);
             },
             onEvent: async (metadata) => {
-                console.log(metadata);
+                console.log("onEvent meta: ",metadata);
             }
         })
 

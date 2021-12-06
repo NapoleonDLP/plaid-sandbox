@@ -40,33 +40,34 @@ app.get('/create-link-token', async (req, res) => {
             client_user_id: 'unique-id'
         },
         client_name: 'Napoleons Plaid Test',
-        products: [Products.Auth],
+        products: [Products.Auth, Products.Identity],
         country_codes: [CountryCode.Us],
         language: 'en'
     });
-
+    console.log("YUH: ", {linkToken})
     res.json({ linkToken });
 });
 
 app.post('/token-exchange', async (req, res) => {
-    console.log("TOKEN EXHCNAGED RAN")
-    const { publicToken } = req.body;
-    const { access_token: accessToken } = await client.exchangePublicToken(publicToken);
+    const { public_token } = req.body;
+    console.log("TOKEN EXHCNAGED RAN", public_token)
+    const { data:{ access_token }} = await client.itemPublicTokenExchange( { public_token } );
+    console.log("TOKES: ", public_token, access_token)
 
-    const authResponse = await client.getAuth(accessToken);
+    const authResponse = await client.authGet({ access_token });
     console.log('---------------------')
     console.log('AUTH RES: ')
-    console.log(util.inspect(authResponse, false, null, true));
+    console.log(util.inspect(authResponse.data, false, null, true));
 
-    const identityResponse = await client.getIdentity(accessToken);
+    const identityResponse = await client.identityGet({ access_token });
     console.log('---------------------')
-    console.log('AUTH RES: ')
-    console.log(util.inspect(identityResponse, false, null, true));
+    console.log('ID RES: ')
+    console.log(util.inspect(identityResponse.data, false, null, true));
 
-    const balanceResponse = await client.getBalance(accessToken);
+    const balanceResponse = await client.accountsBalanceGet({ access_token });
     console.log('---------------------')
-    console.log('AUTH RES: ')
-    console.log(util.inspect(balanceResponse, false, null, true));
+    console.log('BAL RES: ')
+    console.log(util.inspect(balanceResponse.data, false, null, true));
 
     res.sendStatus(200);
 });
